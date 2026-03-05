@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "nest start --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "build": "nest build",
+    "build": "prisma generate && nest build",
+    "postinstall": "prisma generate",
+    "start:prod": "node dist/main.js",
     "start": "nest start",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
