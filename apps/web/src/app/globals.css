@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: white;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 rounded-2xl font-bold hover:bg-neutral-800 transition-all active:scale-95;
+  }
+  
+  .input-field {
+    @apply w-full p-4 border border-neutral-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all;
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "cleaner-platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "db:up": "docker-compose up -d",
+    "prisma:migrate": "pnpm --filter api prisma:migrate",
+    "prisma:generate": "pnpm --filter api prisma:generate",
+    "seed": "pnpm --filter api seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

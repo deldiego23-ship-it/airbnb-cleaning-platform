@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  HOSTER
+  WORKER
+  ADMIN
+}
+
+enum WorkerMode {
+  CLEANER
+  MOTOBOY
+}
+
+enum OrderStatus {
+  PENDING
+  BAG_PREPARING
+  BAG_READY
+  MOTOBOY_ASSIGNED
+  BAG_DELIVERED
+  CLEANING_IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskType {
+  BAG_DELIVERY
+  CLEANING
+  BAG_RETURN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  role      Role
+  mode      WorkerMode?
+  createdAt DateTime @default(now())
+  properties Property[]
+  orders    Order[]    @relation("UserOrders")
+  tasks     Task[]
+  messages  Message[]
+}
+
+model City {
+  id        String   @id @default(uuid())
+  name      String
+  country   String
+  currency  String
+  symbol    String
+  lat       Float
+  lng       Float
+  radius    Float    // Coverage radius in meters
+  properties Property[]
+}
+
+model Property {
+  id                 String   @id @default(uuid())
+  name               String
+  address            String
+  lat                Float
+  lng                Float
+  iCalUrl            String?
+  insideInstructions String?
+  accessCode         String?
+  bedsConfig         Json
+  consumables        Json
+  ownerId            String
+  owner              User     @relation(fields: [ownerId], references: [id])
+  cityId             String
+  city               City     @relation(fields: [cityId], references: [id])
+  orders             Order[]
+}
+
+model Bag {
+  id        String   @id @default(uuid())
+  qrCode    String   @unique
+  status    String   @default("AVAILABLE")
+  orders    Order[]
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  token       String      @unique @default(cuid())
+  status      OrderStatus @default(PENDING)
+  availableAt DateTime
+  propertyId  String
+  property    Property    @relation(fields: [propertyId], references: [id])
+  bagId       String?
+  bag         Bag?        @relation(fields: [bagId], references: [id])
+  userId      String?
+  user        User?       @relation("UserOrders", fields: [userId], references: [id])
+  tasks       Task[]
+  messages    Message[]
+  currency    String
+  createdAt   DateTime    @default(now())
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  type      TaskType
+  status    String   @default("PENDING")
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  workerId  String?
+  worker    User?    @relation(fields: [workerId], references: [id])
+  evidence  Evidence[]
+}
+
+model Evidence {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  mediaUrl  String
+  lat       Float
+  lng       Float
+  timestamp DateTime @default(now())
+  status    String   @default("PENDING_REVIEW") // PENDING_REVIEW, APPROVED, REJECTED
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String?
+  details   Json?
+  createdAt DateTime @default(now())
+}
