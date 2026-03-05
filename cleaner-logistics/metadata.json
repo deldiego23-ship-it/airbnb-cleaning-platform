@@ -1,0 +1,5 @@
+{
+  "name": "Cleaner Logistics",
+  "description": "Full-stack platform for Airbnb cleaning and bag logistics (Uber for cleaning).",
+  "requestFramePermissions": ["camera", "geolocation"]
+}
